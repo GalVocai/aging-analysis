@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qfn-aging"
+version = "0.1.0"
+description = "QFN package reliability-aging study: device allocation, hydrogen/control runs, and analysis."
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "pandas",
+    "openpyxl",
+    "matplotlib",
+    "PySide6",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.scripts]
+qfn-aging = "qfn_aging.gui:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

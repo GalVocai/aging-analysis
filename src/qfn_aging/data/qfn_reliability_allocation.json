@@ -1,0 +1,927 @@
+{
+  "meta": {
+    "source": "QFN_Reliability_Allocation_Plan_EN.docx",
+    "equivalent_experimental_units": 74,
+    "physical_packages": 75,
+    "temps_c": [
+      25,
+      35,
+      45,
+      60
+    ],
+    "rh_pct": [
+      10,
+      30,
+      50
+    ]
+  },
+  "devices": {
+    "1000": {
+      "esn": "1000",
+      "temp_c": 25,
+      "rh_pct": 10,
+      "category": "ParC_only",
+      "type": null,
+      "h2": false,
+      "pair_group": null,
+      "condition": "25C_10RH"
+    },
+    "1195": {
+      "esn": "1195",
+      "temp_c": 25,
+      "rh_pct": 10,
+      "category": "Pd_only",
+      "type": null,
+      "h2": true,
+      "pair_group": null,
+      "condition": "25C_10RH"
+    },
+    "1408": {
+      "esn": "1408",
+      "temp_c": 25,
+      "rh_pct": 10,
+      "category": "PdParC_noH2",
+      "type": "B",
+      "h2": false,
+      "pair_group": null,
+      "condition": "25C_10RH"
+    },
+    "1236": {
+      "esn": "1236",
+      "temp_c": 25,
+      "rh_pct": 10,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "25C_10RH"
+    },
+    "1250": {
+      "esn": "1250",
+      "temp_c": 25,
+      "rh_pct": 10,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "25C_10RH"
+    },
+    "1386": {
+      "esn": "1386",
+      "temp_c": 25,
+      "rh_pct": 10,
+      "category": "PdParC_H2",
+      "type": "B",
+      "h2": true,
+      "pair_group": null,
+      "condition": "25C_10RH"
+    },
+    "1003": {
+      "esn": "1003",
+      "temp_c": 25,
+      "rh_pct": 30,
+      "category": "ParC_only",
+      "type": null,
+      "h2": false,
+      "pair_group": null,
+      "condition": "25C_30RH"
+    },
+    "1196": {
+      "esn": "1196",
+      "temp_c": 25,
+      "rh_pct": 30,
+      "category": "Pd_only",
+      "type": null,
+      "h2": true,
+      "pair_group": null,
+      "condition": "25C_30RH"
+    },
+    "1376": {
+      "esn": "1376",
+      "temp_c": 25,
+      "rh_pct": 30,
+      "category": "PdParC_noH2",
+      "type": "B",
+      "h2": false,
+      "pair_group": null,
+      "condition": "25C_30RH"
+    },
+    "1239": {
+      "esn": "1239",
+      "temp_c": 25,
+      "rh_pct": 30,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "25C_30RH"
+    },
+    "1241": {
+      "esn": "1241",
+      "temp_c": 25,
+      "rh_pct": 30,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "25C_30RH"
+    },
+    "1257": {
+      "esn": "1257",
+      "temp_c": 25,
+      "rh_pct": 30,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "25C_30RH"
+    },
+    "1258": {
+      "esn": "1258",
+      "temp_c": 25,
+      "rh_pct": 30,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "25C_30RH"
+    },
+    "1011": {
+      "esn": "1011",
+      "temp_c": 25,
+      "rh_pct": 50,
+      "category": "ParC_only",
+      "type": null,
+      "h2": false,
+      "pair_group": null,
+      "condition": "25C_50RH"
+    },
+    "1197": {
+      "esn": "1197",
+      "temp_c": 25,
+      "rh_pct": 50,
+      "category": "Pd_only",
+      "type": null,
+      "h2": true,
+      "pair_group": null,
+      "condition": "25C_50RH"
+    },
+    "1281": {
+      "esn": "1281",
+      "temp_c": 25,
+      "rh_pct": 50,
+      "category": "PdParC_noH2",
+      "type": "A",
+      "h2": false,
+      "pair_group": null,
+      "condition": "25C_50RH"
+    },
+    "1242": {
+      "esn": "1242",
+      "temp_c": 25,
+      "rh_pct": 50,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "25C_50RH"
+    },
+    "1243": {
+      "esn": "1243",
+      "temp_c": 25,
+      "rh_pct": 50,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "25C_50RH"
+    },
+    "1388": {
+      "esn": "1388",
+      "temp_c": 25,
+      "rh_pct": 50,
+      "category": "PdParC_H2",
+      "type": "B",
+      "h2": true,
+      "pair_group": null,
+      "condition": "25C_50RH"
+    },
+    "1394": {
+      "esn": "1394",
+      "temp_c": 25,
+      "rh_pct": 50,
+      "category": "PdParC_H2",
+      "type": "B",
+      "h2": true,
+      "pair_group": null,
+      "condition": "25C_50RH"
+    },
+    "1012": {
+      "esn": "1012",
+      "temp_c": 35,
+      "rh_pct": 10,
+      "category": "ParC_only",
+      "type": null,
+      "h2": false,
+      "pair_group": null,
+      "condition": "35C_10RH"
+    },
+    "1198": {
+      "esn": "1198",
+      "temp_c": 35,
+      "rh_pct": 10,
+      "category": "Pd_only",
+      "type": null,
+      "h2": true,
+      "pair_group": null,
+      "condition": "35C_10RH"
+    },
+    "1387": {
+      "esn": "1387",
+      "temp_c": 35,
+      "rh_pct": 10,
+      "category": "PdParC_noH2",
+      "type": "B",
+      "h2": false,
+      "pair_group": null,
+      "condition": "35C_10RH"
+    },
+    "1244": {
+      "esn": "1244",
+      "temp_c": 35,
+      "rh_pct": 10,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "35C_10RH"
+    },
+    "1245": {
+      "esn": "1245",
+      "temp_c": 35,
+      "rh_pct": 10,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "35C_10RH"
+    },
+    "1380": {
+      "esn": "1380",
+      "temp_c": 35,
+      "rh_pct": 10,
+      "category": "PdParC_H2",
+      "type": "B",
+      "h2": true,
+      "pair_group": null,
+      "condition": "35C_10RH"
+    },
+    "1013": {
+      "esn": "1013",
+      "temp_c": 35,
+      "rh_pct": 30,
+      "category": "ParC_only",
+      "type": null,
+      "h2": false,
+      "pair_group": null,
+      "condition": "35C_30RH"
+    },
+    "1199": {
+      "esn": "1199",
+      "temp_c": 35,
+      "rh_pct": 30,
+      "category": "Pd_only",
+      "type": null,
+      "h2": true,
+      "pair_group": null,
+      "condition": "35C_30RH"
+    },
+    "1283": {
+      "esn": "1283",
+      "temp_c": 35,
+      "rh_pct": 30,
+      "category": "PdParC_noH2",
+      "type": "A",
+      "h2": false,
+      "pair_group": null,
+      "condition": "35C_30RH"
+    },
+    "1247": {
+      "esn": "1247",
+      "temp_c": 35,
+      "rh_pct": 30,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "35C_30RH"
+    },
+    "1248": {
+      "esn": "1248",
+      "temp_c": 35,
+      "rh_pct": 30,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "35C_30RH"
+    },
+    "1389": {
+      "esn": "1389",
+      "temp_c": 35,
+      "rh_pct": 30,
+      "category": "PdParC_H2",
+      "type": "B",
+      "h2": true,
+      "pair_group": null,
+      "condition": "35C_30RH"
+    },
+    "1014": {
+      "esn": "1014",
+      "temp_c": 35,
+      "rh_pct": 50,
+      "category": "ParC_only",
+      "type": null,
+      "h2": false,
+      "pair_group": null,
+      "condition": "35C_50RH"
+    },
+    "1200": {
+      "esn": "1200",
+      "temp_c": 35,
+      "rh_pct": 50,
+      "category": "Pd_only",
+      "type": null,
+      "h2": true,
+      "pair_group": null,
+      "condition": "35C_50RH"
+    },
+    "1384": {
+      "esn": "1384",
+      "temp_c": 35,
+      "rh_pct": 50,
+      "category": "PdParC_noH2",
+      "type": "B",
+      "h2": false,
+      "pair_group": null,
+      "condition": "35C_50RH"
+    },
+    "1255": {
+      "esn": "1255",
+      "temp_c": 35,
+      "rh_pct": 50,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "35C_50RH"
+    },
+    "1256": {
+      "esn": "1256",
+      "temp_c": 35,
+      "rh_pct": 50,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "35C_50RH"
+    },
+    "1379": {
+      "esn": "1379",
+      "temp_c": 35,
+      "rh_pct": 50,
+      "category": "PdParC_H2",
+      "type": "B",
+      "h2": true,
+      "pair_group": null,
+      "condition": "35C_50RH"
+    },
+    "1015": {
+      "esn": "1015",
+      "temp_c": 45,
+      "rh_pct": 10,
+      "category": "ParC_only",
+      "type": null,
+      "h2": false,
+      "pair_group": null,
+      "condition": "45C_10RH"
+    },
+    "1201": {
+      "esn": "1201",
+      "temp_c": 45,
+      "rh_pct": 10,
+      "category": "Pd_only",
+      "type": null,
+      "h2": true,
+      "pair_group": null,
+      "condition": "45C_10RH"
+    },
+    "1285": {
+      "esn": "1285",
+      "temp_c": 45,
+      "rh_pct": 10,
+      "category": "PdParC_noH2",
+      "type": "A",
+      "h2": false,
+      "pair_group": null,
+      "condition": "45C_10RH"
+    },
+    "1260": {
+      "esn": "1260",
+      "temp_c": 45,
+      "rh_pct": 10,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "45C_10RH"
+    },
+    "1261": {
+      "esn": "1261",
+      "temp_c": 45,
+      "rh_pct": 10,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "45C_10RH"
+    },
+    "1393": {
+      "esn": "1393",
+      "temp_c": 45,
+      "rh_pct": 10,
+      "category": "PdParC_H2",
+      "type": "B",
+      "h2": true,
+      "pair_group": null,
+      "condition": "45C_10RH"
+    },
+    "1016": {
+      "esn": "1016",
+      "temp_c": 45,
+      "rh_pct": 30,
+      "category": "ParC_only",
+      "type": null,
+      "h2": false,
+      "pair_group": null,
+      "condition": "45C_30RH"
+    },
+    "1202": {
+      "esn": "1202",
+      "temp_c": 45,
+      "rh_pct": 30,
+      "category": "Pd_only",
+      "type": null,
+      "h2": true,
+      "pair_group": null,
+      "condition": "45C_30RH"
+    },
+    "1390": {
+      "esn": "1390",
+      "temp_c": 45,
+      "rh_pct": 30,
+      "category": "PdParC_noH2",
+      "type": "B",
+      "h2": false,
+      "pair_group": null,
+      "condition": "45C_30RH"
+    },
+    "1263": {
+      "esn": "1263",
+      "temp_c": 45,
+      "rh_pct": 30,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "45C_30RH"
+    },
+    "1264": {
+      "esn": "1264",
+      "temp_c": 45,
+      "rh_pct": 30,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "45C_30RH"
+    },
+    "1392": {
+      "esn": "1392",
+      "temp_c": 45,
+      "rh_pct": 30,
+      "category": "PdParC_H2",
+      "type": "B",
+      "h2": true,
+      "pair_group": null,
+      "condition": "45C_30RH"
+    },
+    "1017": {
+      "esn": "1017",
+      "temp_c": 45,
+      "rh_pct": 50,
+      "category": "ParC_only",
+      "type": null,
+      "h2": false,
+      "pair_group": null,
+      "condition": "45C_50RH"
+    },
+    "1203": {
+      "esn": "1203",
+      "temp_c": 45,
+      "rh_pct": 50,
+      "category": "Pd_only",
+      "type": null,
+      "h2": true,
+      "pair_group": null,
+      "condition": "45C_50RH"
+    },
+    "1293": {
+      "esn": "1293",
+      "temp_c": 45,
+      "rh_pct": 50,
+      "category": "PdParC_noH2",
+      "type": "A",
+      "h2": false,
+      "pair_group": null,
+      "condition": "45C_50RH"
+    },
+    "1266": {
+      "esn": "1266",
+      "temp_c": 45,
+      "rh_pct": 50,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "45C_50RH"
+    },
+    "1268": {
+      "esn": "1268",
+      "temp_c": 45,
+      "rh_pct": 50,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "45C_50RH"
+    },
+    "1391": {
+      "esn": "1391",
+      "temp_c": 45,
+      "rh_pct": 50,
+      "category": "PdParC_H2",
+      "type": "B",
+      "h2": true,
+      "pair_group": null,
+      "condition": "45C_50RH"
+    },
+    "1018": {
+      "esn": "1018",
+      "temp_c": 60,
+      "rh_pct": 10,
+      "category": "ParC_only",
+      "type": null,
+      "h2": false,
+      "pair_group": null,
+      "condition": "60C_10RH"
+    },
+    "1204": {
+      "esn": "1204",
+      "temp_c": 60,
+      "rh_pct": 10,
+      "category": "Pd_only",
+      "type": null,
+      "h2": true,
+      "pair_group": null,
+      "condition": "60C_10RH"
+    },
+    "1272": {
+      "esn": "1272",
+      "temp_c": 60,
+      "rh_pct": 10,
+      "category": "PdParC_noH2",
+      "type": "A",
+      "h2": false,
+      "pair_group": null,
+      "condition": "60C_10RH"
+    },
+    "1271": {
+      "esn": "1271",
+      "temp_c": 60,
+      "rh_pct": 10,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "60C_10RH"
+    },
+    "1274": {
+      "esn": "1274",
+      "temp_c": 60,
+      "rh_pct": 10,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "60C_10RH"
+    },
+    "1328": {
+      "esn": "1328",
+      "temp_c": 60,
+      "rh_pct": 10,
+      "category": "PdParC_H2",
+      "type": "B",
+      "h2": true,
+      "pair_group": null,
+      "condition": "60C_10RH"
+    },
+    "1019": {
+      "esn": "1019",
+      "temp_c": 60,
+      "rh_pct": 30,
+      "category": "ParC_only",
+      "type": null,
+      "h2": false,
+      "pair_group": null,
+      "condition": "60C_30RH"
+    },
+    "1205": {
+      "esn": "1205",
+      "temp_c": 60,
+      "rh_pct": 30,
+      "category": "Pd_only",
+      "type": null,
+      "h2": true,
+      "pair_group": null,
+      "condition": "60C_30RH"
+    },
+    "1234": {
+      "esn": "1234",
+      "temp_c": 60,
+      "rh_pct": 30,
+      "category": "PdParC_noH2",
+      "type": "A",
+      "h2": false,
+      "pair_group": "2T_1234_1252",
+      "condition": "60C_30RH"
+    },
+    "1252": {
+      "esn": "1252",
+      "temp_c": 60,
+      "rh_pct": 30,
+      "category": "PdParC_noH2",
+      "type": "A",
+      "h2": false,
+      "pair_group": "2T_1234_1252",
+      "condition": "60C_30RH"
+    },
+    "1277": {
+      "esn": "1277",
+      "temp_c": 60,
+      "rh_pct": 30,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "60C_30RH"
+    },
+    "1278": {
+      "esn": "1278",
+      "temp_c": 60,
+      "rh_pct": 30,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "60C_30RH"
+    },
+    "1377": {
+      "esn": "1377",
+      "temp_c": 60,
+      "rh_pct": 30,
+      "category": "PdParC_H2",
+      "type": "B",
+      "h2": true,
+      "pair_group": null,
+      "condition": "60C_30RH"
+    },
+    "1020": {
+      "esn": "1020",
+      "temp_c": 60,
+      "rh_pct": 50,
+      "category": "ParC_only",
+      "type": null,
+      "h2": false,
+      "pair_group": null,
+      "condition": "60C_50RH"
+    },
+    "1206": {
+      "esn": "1206",
+      "temp_c": 60,
+      "rh_pct": 50,
+      "category": "Pd_only",
+      "type": null,
+      "h2": true,
+      "pair_group": null,
+      "condition": "60C_50RH"
+    },
+    "1397": {
+      "esn": "1397",
+      "temp_c": 60,
+      "rh_pct": 50,
+      "category": "PdParC_noH2",
+      "type": "B",
+      "h2": false,
+      "pair_group": null,
+      "condition": "60C_50RH"
+    },
+    "1279": {
+      "esn": "1279",
+      "temp_c": 60,
+      "rh_pct": 50,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "60C_50RH"
+    },
+    "1280": {
+      "esn": "1280",
+      "temp_c": 60,
+      "rh_pct": 50,
+      "category": "PdParC_H2",
+      "type": "A",
+      "h2": true,
+      "pair_group": null,
+      "condition": "60C_50RH"
+    },
+    "1385": {
+      "esn": "1385",
+      "temp_c": 60,
+      "rh_pct": 50,
+      "category": "PdParC_H2",
+      "type": "B",
+      "h2": true,
+      "pair_group": null,
+      "condition": "60C_50RH"
+    }
+  },
+  "runs": {
+    "H2_run1_25C": {
+      "kind": "hydrogen",
+      "day": 1,
+      "order": 1,
+      "temp_c": 25,
+      "capacity_packages": 14,
+      "cards": {
+        "119": "1195",
+        "120": "1236",
+        "124": "1250",
+        "125": "1386",
+        "166": "1196",
+        "167": "1239",
+        "168": "1241",
+        "169": "1258",
+        "117": "1257",
+        "170": "1197",
+        "171": "1242",
+        "172": "1243",
+        "173": "1388",
+        "175": "1394"
+      }
+    },
+    "H2_run2_35C": {
+      "kind": "hydrogen",
+      "day": 1,
+      "order": 2,
+      "temp_c": 35,
+      "capacity_packages": 12,
+      "cards": {
+        "119": "1198",
+        "120": "1244",
+        "124": "1245",
+        "125": "1380",
+        "166": "1199",
+        "167": "1247",
+        "168": "1248",
+        "169": "1389",
+        "170": "1200",
+        "171": "1255",
+        "172": "1256",
+        "173": "1379"
+      }
+    },
+    "H2_run3_45C": {
+      "kind": "hydrogen",
+      "day": 1,
+      "order": 3,
+      "temp_c": 45,
+      "capacity_packages": 12,
+      "cards": {
+        "119": "1201",
+        "120": "1260",
+        "124": "1261",
+        "125": "1393",
+        "166": "1202",
+        "167": "1263",
+        "168": "1264",
+        "169": "1392",
+        "170": "1203",
+        "171": "1266",
+        "172": "1268",
+        "173": "1391"
+      }
+    },
+    "H2_run4_60C": {
+      "kind": "hydrogen",
+      "day": 1,
+      "order": 4,
+      "temp_c": 60,
+      "capacity_packages": 12,
+      "cards": {
+        "119": "1204",
+        "120": "1271",
+        "124": "1274",
+        "125": "1328",
+        "166": "1205",
+        "167": "1277",
+        "168": "1278",
+        "169": "1377",
+        "170": "1206",
+        "171": "1279",
+        "172": "1280",
+        "173": "1385"
+      }
+    },
+    "control_run1": {
+      "kind": "control",
+      "day": 2,
+      "order": 1,
+      "temp_c": null,
+      "capacity_packages": 12,
+      "cards": {
+        "119": "1000",
+        "120": "1408",
+        "124": "1003",
+        "125": "1376",
+        "166": "1011",
+        "167": "1281",
+        "168": "1012",
+        "169": "1387",
+        "170": "1013",
+        "171": "1283",
+        "172": "1014",
+        "173": "1384"
+      }
+    },
+    "control_run2": {
+      "kind": "control",
+      "day": 2,
+      "order": 2,
+      "temp_c": null,
+      "capacity_packages": 13,
+      "cards": {
+        "119": "1015",
+        "120": "1285",
+        "124": "1016",
+        "125": "1390",
+        "166": "1017",
+        "167": "1293",
+        "168": "1018",
+        "169": "1272",
+        "170": "1019",
+        "171": "1234",
+        "172": "1252",
+        "173": "1020",
+        "117": "1397"
+      }
+    }
+  },
+  "schedule": [
+    {
+      "day": 1,
+      "run_id": "H2_run1_25C"
+    },
+    {
+      "day": 1,
+      "run_id": "H2_run2_35C"
+    },
+    {
+      "day": 1,
+      "run_id": "H2_run3_45C"
+    },
+    {
+      "day": 1,
+      "run_id": "H2_run4_60C"
+    },
+    {
+      "day": 2,
+      "run_id": "control_run1"
+    },
+    {
+      "day": 2,
+      "run_id": "control_run2"
+    }
+  ]
+}

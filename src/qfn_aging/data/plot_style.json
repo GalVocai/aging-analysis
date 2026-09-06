@@ -1,0 +1,113 @@
+{
+  "bg_colors": {
+    "-4": "#2ca02c",
+    "0": "#00ff00",
+    "4": "#008000"
+  },
+  "show_vbg": [
+    0,
+    4
+  ],
+  "same_vbg_color": false,
+  "single_vbg_color": "#1f77b4",
+  "air_color": "#008000",
+  "h2_color": "#00ff00",
+  "recovery_color": "#2ca02c",
+  "show_recovery": false,
+  "linewidth": 3.0,
+  "linestyle": "-",
+  "se_color": "#1f77b4",
+  "se_stack_per_esn": true,
+  "se_gradient": true,
+  "se_cmap": "Blues",
+  "se_intensity": 0.18359375,
+  "se_uniform_y": true,
+  "se_stack_dc_shift": true,
+  "se_normalize": false,
+  "steps_uniform_y": true,
+  "steps_stack_dc_shift": true,
+  "steps_normalize": false,
+  "stack_hidden": {},
+  "uniform_y_margin_nA": 1000.0,
+  "steps_gradient": true,
+  "steps_cmap": "Blues",
+  "steps_intensity": 0.509375,
+  "steps_stack_per_esn": true,
+  "same_vbg_linestyle": true,
+  "yscale_override": "auto",
+  "xlim": [
+    0.0,
+    400.0
+  ],
+  "ylim": [],
+  "show_legend": true,
+  "legend_metrics": false,
+  "h2_label": "100ppm H2",
+  "show_vth_line": false,
+  "show_delta_vth": true,
+  "show_vth_marker": true,
+  "show_major_grid": true,
+  "x_major_step": 0.0,
+  "y_major_step": 500.0,
+  "zozo_show_exp_fit": false,
+  "zozo_show_lin_slope": false,
+  "zozo_stack_per_esn": true,
+  "title_templates": {
+    "SE": "{ESN} Sensing 100 ppm H2 {Day} {WP}",
+    "STEPS": "{ESN} H2 {Mode} {Day} {WP}",
+    "JG_H2": "{ESN} {Mode} {Day}",
+    "JG": "{ESN} {T} {Mode} {Day}",
+    "ZOZO": "{ESN} {T} {Mode} {Day} {WP}",
+    "JGH": ""
+  },
+  "mode_axes": {
+    "SE": {
+      "yscale": "auto",
+      "xlim": [],
+      "ylim": [],
+      "grid": false,
+      "x_step": 0.0,
+      "y_step": 0.0
+    },
+    "STEPS": {
+      "yscale": "auto",
+      "xlim": [],
+      "ylim": [],
+      "grid": false,
+      "x_step": 0.0,
+      "y_step": 0.0
+    },
+    "JG": {
+      "yscale": "auto",
+      "xlim": [],
+      "ylim": [],
+      "grid": false,
+      "x_step": 0.2,
+      "y_step": 0.0
+    },
+    "JG_H2": {
+      "yscale": "auto",
+      "xlim": [],
+      "ylim": [],
+      "grid": false,
+      "x_step": 0.2,
+      "y_step": 0.0
+    },
+    "JGH": {
+      "yscale": "auto",
+      "xlim": [],
+      "ylim": [],
+      "grid": false,
+      "x_step": 0.0,
+      "y_step": 0.0
+    },
+    "ZOZO": {
+      "yscale": "auto",
+      "xlim": [],
+      "ylim": [],
+      "grid": false,
+      "x_step": 0.0,
+      "y_step": 0.0
+    }
+  }
+}
