@@ -91,3 +91,16 @@ def test_empty_root_returns_empty_frame_with_schema(tmp_path):
     t = load_masters(tmp_path)
     assert t.empty
     assert "metric" in t.columns and "sheet" in t.columns
+
+
+def test_unreadable_workbook_is_reported_and_other_data_still_loads(analysis_root):
+    bad_dir = analysis_root / "3D" / "control" / "25C_10RH" / "JG"
+    bad_dir.mkdir(parents=True)
+    bad = bad_dir / "master_JG.xlsx"
+    bad.write_bytes(b"this is not an Excel workbook")
+    lines: list[str] = []
+
+    tidy = load_masters(analysis_root, log=lines.append)
+
+    assert not tidy.empty
+    assert any("could not read" in line and str(bad) in line for line in lines)

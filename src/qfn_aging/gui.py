@@ -496,12 +496,11 @@ class MainWindow(QMainWindow):
             def on_progress(done, total, label):
                 # marshalled onto the UI thread by the queued signal below
                 self._analysis_progress.emit(done, total, label)
-                if self._cancel_requested:
-                    raise _Cancelled()
 
             analyze_all(root, out, self.alloc, make_plots=make_plots,
                         timepoints=timepoints, skip_existing=skip_existing,
-                        workers=workers, progress=on_progress, log=emit)
+                        workers=workers, progress=on_progress, log=emit,
+                        cancelled=lambda: self._cancel_requested)
 
         self._cancel_requested = False
         self.progress.canceled.connect(self._request_cancel)
@@ -509,7 +508,7 @@ class MainWindow(QMainWindow):
 
     def _request_cancel(self) -> None:
         self._cancel_requested = True
-        self._emit("Cancel requested — stopping after the current run…")
+        self._emit("Cancel requested — stopping before more runs are started…")
 
     def _on_analysis_progress(self, done: int, total: int, label: str) -> None:
         if self.progress is None:
@@ -557,7 +556,7 @@ class MainWindow(QMainWindow):
 
         if ok:
             self._emit(self._done_msg)
-        elif "_Cancelled" in err:
+        elif "_Cancelled" in err or "AnalysisCancelled" in err:
             self._emit("Analysis cancelled. Output written so far is kept.")
         else:
             self._emit(f"FAILED:\n{err}")
@@ -875,7 +874,7 @@ class MainWindow(QMainWindow):
             QApplication.processEvents()
 
         try:
-            tidy = load_masters(analysis, progress=on_progress)
+            tidy = load_masters(analysis, progress=on_progress, log=self._emit)
         except _Cancelled:
             dlg.close()
             self._emit("Loading cancelled.")

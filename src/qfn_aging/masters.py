@@ -76,6 +76,7 @@ def _tidy_sheet(df: pd.DataFrame, timepoint: str, run_key: str, mode: str,
 def load_masters(analysis_root: str | Path,
                  modes: list[str] | None = None,
                  progress: Callable[[int, int, str], None] | None = None,
+                 log: Callable[[str], None] | None = None,
                  ) -> pd.DataFrame:
     """Load every master under ``analysis_root`` into one tidy frame.
 
@@ -88,9 +89,13 @@ def load_masters(analysis_root: str | Path,
     ``progress`` is called as ``progress(done, total, label)`` before each
     workbook is read, so a GUI can show real progress rather than freezing.
     Reading ~130 workbooks takes several seconds.
+
+    Unreadable workbooks are skipped so one damaged file does not hide all
+    usable results, but every skip is reported through ``log`` when supplied.
     """
     analysis_root = Path(analysis_root)
     frames: list[pd.DataFrame] = []
+    emit = log or (lambda _message: None)
 
     paths = [p for p in sorted(analysis_root.glob("*/*/*/*/master_*.xlsx"))
              if not p.name.startswith("~$")
@@ -106,7 +111,8 @@ def load_masters(analysis_root: str | Path,
         run_key = path.parents[2].name
         try:
             sheets = pd.read_excel(path, sheet_name=None)
-        except Exception:
+        except Exception as exc:
+            emit(f"WARNING: could not read {path}: {type(exc).__name__}: {exc}")
             continue
         for sheet, df in sheets.items():
             # sensorlab's population diagnostics, not measurements

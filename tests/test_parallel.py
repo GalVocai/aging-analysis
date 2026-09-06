@@ -205,6 +205,108 @@ def test_broken_pool_falls_back_to_serial_instead_of_losing_runs(tree, tmp_path,
     assert any("Falling back" in ln for ln in lines)
 
 
+def test_broken_pool_tracks_completed_runs_per_timepoint(tmp_path, monkeypatch):
+    """Completing baseline/25C_H2 must not skip 3D/25C_H2 in fallback."""
+    from concurrent.futures.process import BrokenProcessPool
+
+    import concurrent.futures as cf
+    import qfn_aging.runner as R
+    from qfn_aging.discovery import RunFolder
+
+    runs = [
+        RunFolder(tmp_path / "a", "baseline", "25C_H2", None, []),
+        RunFolder(tmp_path / "b", "3D", "25C_H2", None, []),
+        RunFolder(tmp_path / "c", "baseline", "35C_H2", None, []),
+    ]
+
+    class FakeFuture:
+        def __init__(self, rf, fail=False):
+            self.rf, self.fail = rf, fail
+
+        def result(self):
+            if self.fail:
+                raise BrokenProcessPool("pool died after one result")
+            return RunResult(self.rf.timepoint, self.rf.run_key, self.rf.run_id,
+                             self.rf.path, {}), []
+
+        def cancel(self):
+            return True
+
+    class FailingPool:
+        def __init__(self, max_workers=None):
+            self.futures = []
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def submit(self, fn, payload):
+            future = FakeFuture(payload[0], fail=(len(self.futures) == 1))
+            self.futures.append(future)
+            return future
+
+    monkeypatch.setattr(cf, "ProcessPoolExecutor", FailingPool)
+    monkeypatch.setattr(cf, "as_completed", lambda futures: list(futures))
+
+    fallback: list[tuple[str, str]] = []
+
+    def fake_analyze(rf, *args, **kwargs):
+        fallback.append((rf.timepoint, rf.run_key))
+        return RunResult(rf.timepoint, rf.run_key, rf.run_id, rf.path, {})
+
+    monkeypatch.setattr(R, "analyze_run", fake_analyze)
+    results = R._analyze_parallel(runs, tmp_path / "out", DEFAULT, False, None,
+                                  90, 2, None, lambda _line: None)
+
+    assert ("3D", "25C_H2") in fallback
+    assert {(r.timepoint, r.run_key) for r in results} == {
+        ("baseline", "25C_H2"), ("3D", "25C_H2"), ("baseline", "35C_H2")}
+
+
+def test_parallel_cancellation_cancels_pending_futures(tree, tmp_path, monkeypatch):
+    import concurrent.futures as cf
+    import qfn_aging.runner as R
+    from qfn_aging.discovery import discover
+
+    runs, _ = discover(tree, timepoints=["baseline"])
+    created = []
+
+    class PendingFuture:
+        def __init__(self):
+            self.cancel_called = False
+
+        def cancel(self):
+            self.cancel_called = True
+            return True
+
+    class Pool:
+        def __init__(self, max_workers=None):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def submit(self, fn, payload):
+            future = PendingFuture()
+            created.append(future)
+            return future
+
+    monkeypatch.setattr(cf, "ProcessPoolExecutor", Pool)
+    monkeypatch.setattr(cf, "as_completed", lambda futures: list(futures))
+
+    with pytest.raises(R.AnalysisCancelled):
+        R._analyze_parallel(runs, tmp_path / "out", DEFAULT, False, None,
+                            90, 4, None, lambda _line: None,
+                            cancelled=lambda: True)
+
+    assert created and all(f.cancel_called for f in created)
+
+
 # -- parallel execution ----------------------------------------------------
 
 def test_parallel_and_serial_cover_the_same_runs(tree, tmp_path, monkeypatch):
@@ -241,7 +343,7 @@ def test_workers_are_capped_at_the_number_of_runs(tree, tmp_path, monkeypatch):
     captured = {}
 
     def fake_parallel(runs, out_root, alloc, make_plots, style_path, dpi,
-                      workers, progress, emit):
+                      workers, progress, emit, cancelled=None):
         captured["workers"] = workers
         captured["runs"] = len(runs)
         captured["dpi"] = dpi

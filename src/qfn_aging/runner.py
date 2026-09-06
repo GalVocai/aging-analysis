@@ -64,6 +64,19 @@ _FORBIDDEN_ROOT = Path.home() / ".sensorlab"
 #: so QFN-AGING figures never depend on the other project's settings.
 STYLE_PATH = Path(__file__).parent / "data" / "plot_style.json"
 
+# sensorlab writes one master folder per analysis mode. Several JG majors
+# intentionally share one workbook, while JG_H2 is derived when both the air
+# and hydrogen sweeps are present.
+_MASTER_MODE_BY_MAJOR = {
+    "n01": "ZOZO",
+    "n02": "JGH",
+    "n03": "JG",
+    "n04": "SE",
+    "n05": "JG",
+    "n06": "JG",
+    "n07": "STEPS",
+}
+
 #: Output resolution for the per-device figures.
 #:
 #: sensorlab hardcodes ``dpi=110`` at each ``savefig`` call, which dominates
@@ -73,6 +86,15 @@ STYLE_PATH = Path(__file__).parent / "data" / "plot_style.json"
 #: reading degradation trends. :func:`_plot_dpi` applies it without touching
 #: sensorlab; set to ``None`` to keep whatever sensorlab asks for.
 PLOT_DPI: int | None = 90
+
+
+class AnalysisCancelled(RuntimeError):
+    """The user cancelled a sweep between runs."""
+
+
+def _run_identity(rf: RunFolder) -> tuple[str, str, str]:
+    """Stable identity for a discovered run, including its measurement day."""
+    return rf.timepoint, rf.run_key, str(rf.path)
 
 
 def ensure_multiprocessing_executable() -> str | None:
@@ -261,8 +283,21 @@ def has_output(rf: RunFolder, out_root: str | Path,
         return any(base.glob("*/*/master_*.xlsx"))
 
     conditions = {alloc.device(e).condition for e in alloc.runs[rf.run_id].cards.values()}
-    return all((base / c).is_dir() and any((base / c).glob("*/master_*.xlsx"))
-               for c in conditions)
+    modes = {_MASTER_MODE_BY_MAJOR[m] for m in rf.majors if m in _MASTER_MODE_BY_MAJOR}
+    if {"n03", "n05"}.issubset(rf.majors):
+        modes.add("JG_H2")
+    if not modes:
+        return False
+
+    # A single leftover workbook is not a completed run. Require the exact
+    # master for every mode that the discovered input files can produce, in
+    # every condition assigned to this run. ``WP`` remains optional because
+    # a script workbook may legitimately contain no States sheet.
+    return all(
+        (base / condition / mode / f"master_{mode}.xlsx").is_file()
+        for condition in conditions
+        for mode in modes
+    )
 
 
 def analyze_all(root: str | Path, out_root: str | Path, alloc: Allocation = DEFAULT,
@@ -270,7 +305,8 @@ def analyze_all(root: str | Path, out_root: str | Path, alloc: Allocation = DEFA
                 timepoints: list[str] | None = None, skip_existing: bool = False,
                 workers: int = 1, dpi: int | None = PLOT_DPI,
                 progress: Callable[[int, int, str], None] | None = None,
-                log: Callable[[str], None] | None = None) -> list[RunResult]:
+                log: Callable[[str], None] | None = None,
+                cancelled: Callable[[], bool] | None = None) -> list[RunResult]:
     """Discover runs under ``root`` and analyze each one.
 
     ``timepoints`` restricts the work to those days -- pass ``["3D"]`` when
@@ -286,6 +322,10 @@ def analyze_all(root: str | Path, out_root: str | Path, alloc: Allocation = DEFA
 
     ``progress`` is called as ``progress(done, total, label)``, so a GUI can
     show a bar over what is otherwise a multi-minute job.
+
+    ``cancelled`` is polled between serial runs and between completed
+    parallel jobs. Pending parallel futures are cancelled; workers already
+    executing a run are allowed to finish without corrupting their output.
     """
     emit = log or (lambda _m: None)
     runs, warnings = discover(root, alloc, timepoints=timepoints)
@@ -312,10 +352,13 @@ def analyze_all(root: str | Path, out_root: str | Path, alloc: Allocation = DEFA
 
     if workers and workers > 1 and len(runs) > 1:
         return _analyze_parallel(runs, out_root, alloc, make_plots, style_path,
-                                 dpi, workers, progress, emit)
+                                 dpi, workers, progress, emit, cancelled)
 
     results: list[RunResult] = []
     for i, rf in enumerate(runs):
+        if cancelled is not None and cancelled():
+            emit("analysis cancelled; output written so far is kept")
+            raise AnalysisCancelled("analysis cancelled")
         if progress is not None:
             progress(i, len(runs), f"{rf.timepoint} / {rf.run_key}")
         results.append(analyze_run(rf, out_root, alloc, make_plots=make_plots,
@@ -326,7 +369,7 @@ def analyze_all(root: str | Path, out_root: str | Path, alloc: Allocation = DEFA
 
 
 def _analyze_parallel(runs, out_root, alloc, make_plots, style_path, dpi,
-                      workers: int, progress, emit) -> list[RunResult]:
+                      workers: int, progress, emit, cancelled=None) -> list[RunResult]:
     """Run the folders across processes.
 
     The runs are independent -- each reads its own folder and writes its own
@@ -348,7 +391,10 @@ def _analyze_parallel(runs, out_root, alloc, make_plots, style_path, dpi,
 
     payload = [(rf, str(out_root), alloc, make_plots, style_path, dpi) for rf in runs]
     results: list[RunResult] = []
-    completed: set[str] = set()
+    # A run key repeats at every timepoint (for example ``25C_H2``). Tracking
+    # only the key made a broken-pool fallback incorrectly treat the same run
+    # on every other day as already complete.
+    completed: set[tuple[str, str, str]] = set()
     done = 0
     if progress is not None:
         progress(0, len(runs), f"starting {workers} workers")
@@ -357,6 +403,11 @@ def _analyze_parallel(runs, out_root, alloc, make_plots, style_path, dpi,
         with ProcessPoolExecutor(max_workers=workers) as pool:
             futures = {pool.submit(_run_one, p): p[0] for p in payload}
             for fut in as_completed(futures):
+                if cancelled is not None and cancelled():
+                    for pending in futures:
+                        pending.cancel()
+                    emit("analysis cancelled; waiting for active workers to finish")
+                    raise AnalysisCancelled("analysis cancelled")
                 rf = futures[fut]
                 try:
                     result, lines = fut.result()
@@ -371,7 +422,7 @@ def _analyze_parallel(runs, out_root, alloc, make_plots, style_path, dpi,
                     for ln in lines:
                         emit(ln)
                 results.append(result)
-                completed.add(rf.run_key)
+                completed.add(_run_identity(rf))
                 done += 1
                 if progress is not None:
                     progress(done, len(runs), f"{rf.timepoint} / {rf.run_key} finished")
@@ -381,8 +432,11 @@ def _analyze_parallel(runs, out_root, alloc, make_plots, style_path, dpi,
         # instead of losing every run that was in flight.
         emit(f"WARNING: parallel execution failed ({exc}). "
              f"Falling back to one process at a time — this is slower but reliable.")
-        remaining = [rf for rf in runs if rf.run_key not in completed]
+        remaining = [rf for rf in runs if _run_identity(rf) not in completed]
         for i, rf in enumerate(remaining):
+            if cancelled is not None and cancelled():
+                emit("analysis cancelled; output written so far is kept")
+                raise AnalysisCancelled("analysis cancelled")
             if progress is not None:
                 progress(len(completed) + i, len(runs),
                          f"{rf.timepoint} / {rf.run_key} (serial fallback)")

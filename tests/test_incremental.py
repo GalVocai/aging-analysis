@@ -32,12 +32,15 @@ def tree(tmp_path):
     return tmp_path
 
 
-def _write_masters(out_root, timepoint, out_group, conditions):
+def _write_masters(out_root, timepoint, out_group, conditions,
+                   modes=("ZOZO", "JGH", "JG")):
     for c in conditions:
-        d = out_root / timepoint / out_group / c / "JG"
-        d.mkdir(parents=True, exist_ok=True)
-        pd.DataFrame({"ESN": [1], "TNumber": [11], "day": [timepoint], "Vth_bg4": [1.0]}) \
-            .to_excel(d / "master_JG.xlsx", index=False)
+        for mode in modes:
+            d = out_root / timepoint / out_group / c / mode
+            d.mkdir(parents=True, exist_ok=True)
+            pd.DataFrame({"ESN": [1], "TNumber": [11], "day": [timepoint],
+                          "Vth_bg4": [1.0]}).to_excel(
+                              d / f"master_{mode}.xlsx", index=False)
 
 
 def test_available_timepoints_in_study_order(tree):
@@ -78,6 +81,20 @@ def test_has_output_distinguishes_the_two_control_runs(tree, tmp_path):
 
     assert has_output(set1, out, DEFAULT)
     assert not has_output(set2, out, DEFAULT)        # the bug this guards
+
+
+def test_has_output_rejects_a_partial_run(tree, tmp_path):
+    out = tmp_path / "out"
+    runs, _ = discover(tree, timepoints=["baseline"])
+    set1 = next(r for r in runs if r.run_key == "control_set1")
+    conditions = {DEFAULT.device(e).condition
+                  for e in DEFAULT.runs["control_run1"].cards.values()}
+
+    _write_masters(out, "baseline", "control", conditions, modes=("JG",))
+    assert not has_output(set1, out, DEFAULT)
+
+    _write_masters(out, "baseline", "control", conditions)
+    assert has_output(set1, out, DEFAULT)
 
 
 def test_skip_existing_leaves_finished_runs_alone(tree, tmp_path, monkeypatch):
@@ -132,12 +149,31 @@ def test_progress_callback_reports_each_run(tree, tmp_path, monkeypatch):
     assert seen[-1] == (6, 6, "done")
 
 
+def test_serial_cancellation_stops_before_the_next_run(tree, tmp_path, monkeypatch):
+    from qfn_aging.runner import AnalysisCancelled, RunResult
+
+    called: list[str] = []
+
+    def fake_analyze_run(rf, out_root, alloc=DEFAULT, **kwargs):
+        called.append(f"{rf.timepoint}/{rf.run_key}")
+        return RunResult(rf.timepoint, rf.run_key, rf.run_id, rf.path, {})
+
+    monkeypatch.setattr("qfn_aging.runner.analyze_run", fake_analyze_run)
+
+    with pytest.raises(AnalysisCancelled):
+        analyze_all(tree, tmp_path / "out", timepoints=["3D"], workers=1,
+                    cancelled=lambda: len(called) >= 1)
+
+    assert len(called) == 1
+
+
 def test_nothing_to_do_is_reported_not_crashed(tree, tmp_path):
     out = tmp_path / "out"
     for group, rid in (("25C_H2", "H2_run1_25C"), ("35C_H2", "H2_run2_35C"),
                        ("45C_H2", "H2_run3_45C"), ("60C_H2", "H2_run4_60C")):
         conds = {DEFAULT.device(e).condition for e in DEFAULT.runs[rid].cards.values()}
-        _write_masters(out, "3D", group, conds)
+        _write_masters(out, "3D", group, conds,
+                       modes=("ZOZO", "JGH", "JG", "SE", "STEPS", "JG_H2"))
     for rid in ("control_run1", "control_run2"):
         conds = {DEFAULT.device(e).condition for e in DEFAULT.runs[rid].cards.values()}
         _write_masters(out, "3D", "control", conds)
