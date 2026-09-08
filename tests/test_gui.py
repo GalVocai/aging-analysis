@@ -20,7 +20,8 @@ pytest.importorskip("PySide6")
 from PySide6.QtCore import Qt  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from qfn_aging.gui import ConditionTree, MainWindow  # noqa: E402
+from qfn_aging.device_metrics import DEVICE_METRICS  # noqa: E402
+from qfn_aging.gui import TREE_COLUMNS, ConditionPanel, ConditionTree, MainWindow  # noqa: E402
 from qfn_aging.selection import Selection, load_selection  # noqa: E402
 
 
@@ -139,6 +140,71 @@ def test_refresh_reflects_an_externally_changed_selection(tree):
     assert tree.counts() == (7, 8)
 
 
+def test_metric_columns_show_transistors_and_device_mean(qapp, frame):
+    sub = frame[(frame["condition"] == "25C_10RH")
+                & (frame["timepoint"] == "baseline")].copy()
+    sub["dvth03_bg0"] = [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0]
+    metric_column = TREE_COLUMNS.index("ΔVth03 BG0 [mV]")
+    metric_tree = ConditionTree(sub, Selection(), "baseline")
+    dev = metric_tree.topLevelItem(0)
+
+    assert dev.child(0).text(metric_column) == "10.0"
+    assert dev.text(metric_column) == "25.0"
+
+    dev.child(3).setCheckState(0, Qt.Unchecked)
+    assert dev.text(metric_column) == "20.0"
+
+
+def test_category_summary_updates_when_a_device_is_excluded(qapp, frame, isolated):
+    values = frame.copy()
+    values["dvth03_bg0"] = values["esn"].map({"1236": 10.0, "1250": 30.0,
+                                                "1019": 100.0})
+    win = isolated()
+    win.populate(values)
+    summary = win.panels[("baseline", "25C_10RH")].summary
+    metric_column = 1 + next(i for i, spec in enumerate(DEVICE_METRICS)
+                             if spec.key == "dvth03_bg0")
+    category_row = 2  # CATEGORY_ORDER: PdParC_H2 is the third row
+
+    assert summary.item(category_row, metric_column).text() == "20.0 ± 10.0  (n=8)"
+
+    win.tree_for("baseline", "25C_10RH").topLevelItem(0).setCheckState(0, Qt.Unchecked)
+    assert summary.item(category_row, metric_column).text() == "30.0 ± 0.0  (n=4)"
+
+
+def test_category_filter_hides_other_devices_without_changing_selection(qapp):
+    rows = pd.DataFrame(
+        _rows("1236", "25C_10RH", "PdParC_H2")
+        + _rows("1019", "25C_10RH", "ParC_only", type_=None, h2=False))
+    selection = Selection()
+    category_tree = ConditionTree(rows, selection, "baseline")
+
+    category_tree.set_category_filter("PdParC_H2")
+    visible = [category_tree.topLevelItem(i).text(1)
+               for i in range(category_tree.topLevelItemCount())
+               if not category_tree.topLevelItem(i).isHidden()]
+    assert visible == ["PdParC_H2"]
+    assert len(selection) == 0                       # visual filter only
+
+    category_tree.set_all(False)                    # bulk action targets visible rows
+    assert selection.excluded_for("baseline", "1236") == [11, 12, 31, 32]
+    assert selection.excluded_for("baseline", "1019") == []
+
+
+def test_category_filter_also_filters_summary_rows(qapp):
+    rows = pd.DataFrame(
+        _rows("1236", "25C_10RH", "PdParC_H2")
+        + _rows("1019", "25C_10RH", "ParC_only", type_=None, h2=False))
+    panel = ConditionPanel(rows, Selection(), "baseline")
+
+    panel.set_category_filter("PdParC_H2")
+    assert panel.summary.isRowHidden(0)               # ParC only
+    assert not panel.summary.isRowHidden(2)           # PdParC H2
+
+    panel.set_category_filter(None)
+    assert not any(panel.summary.isRowHidden(i) for i in range(4))
+
+
 # -- day tabs --------------------------------------------------------------
 
 def test_one_tab_per_day_each_holding_its_conditions(qapp, frame, isolated):
@@ -154,7 +220,9 @@ def test_one_tab_per_day_each_holding_its_conditions(qapp, frame, isolated):
                  for i in range(win.cond_tab_widgets[day].count())]
         assert conds == ["25C_10RH", "60C_30RH"]
 
-    assert set(win.trees) == {(d, c) for d in days for c in ("25C_10RH", "60C_30RH")}
+    assert set(win._condition_frames) == {
+        (d, c) for d in days for c in ("25C_10RH", "60C_30RH")}
+    assert len(win.trees) == 1  # only the visible panel is built eagerly
 
 
 def test_tab_titles_carry_counts(qapp, frame, isolated):
@@ -168,10 +236,10 @@ def test_excluding_on_one_day_only_changes_that_days_tabs(qapp, frame, isolated)
     win = isolated()
     win.populate(frame)
 
-    win.trees[("3D", "25C_10RH")].topLevelItem(0).setCheckState(0, Qt.Unchecked)
+    win.tree_for("3D", "25C_10RH").topLevelItem(0).setCheckState(0, Qt.Unchecked)
 
-    assert win.trees[("baseline", "25C_10RH")].counts() == (8, 8)
-    assert win.trees[("3D", "25C_10RH")].counts() == (4, 8)
+    assert win.tree_for("baseline", "25C_10RH").counts() == (8, 8)
+    assert win.tree_for("3D", "25C_10RH").counts() == (4, 8)
     assert "(8/12)" in win.day_tabs.tabText(1)
     assert "(12/12)" in win.day_tabs.tabText(0)
 
@@ -179,7 +247,7 @@ def test_excluding_on_one_day_only_changes_that_days_tabs(qapp, frame, isolated)
 def test_status_line_reports_the_current_day(qapp, frame, isolated):
     win = isolated()
     win.populate(frame)
-    win.trees[("3D", "25C_10RH")].topLevelItem(0).child(0).setCheckState(0, Qt.Unchecked)
+    win.tree_for("3D", "25C_10RH").topLevelItem(0).child(0).setCheckState(0, Qt.Unchecked)
 
     win.day_tabs.setCurrentIndex(1)
     msg = win.statusBar().currentMessage()
@@ -194,7 +262,7 @@ def test_ticking_auto_saves_without_pressing_save(qapp, frame, tmp_path):
     win = MainWindow(selection_path=path, settings_path=tmp_path / "settings.json")
     win.populate(frame)
 
-    win.trees[("baseline", "25C_10RH")].topLevelItem(0).child(0) \
+    win.tree_for("baseline", "25C_10RH").topLevelItem(0).child(0) \
         .setCheckState(0, Qt.Unchecked)
 
     assert path.is_file(), "selection was not written on change"
@@ -209,12 +277,12 @@ def test_a_fresh_window_reopens_with_previous_exclusions(qapp, frame, tmp_path):
 
     first = MainWindow(selection_path=path, settings_path=settings)
     first.populate(frame)
-    first.trees[("3D", "60C_30RH")].topLevelItem(0).setCheckState(0, Qt.Unchecked)
+    first.tree_for("3D", "60C_30RH").topLevelItem(0).setCheckState(0, Qt.Unchecked)
 
     second = MainWindow(selection_path=path, settings_path=settings)
     second.populate(frame)
-    assert second.trees[("3D", "60C_30RH")].counts() == (0, 4)
-    assert second.trees[("baseline", "60C_30RH")].counts() == (4, 4)
+    assert second.tree_for("3D", "60C_30RH").counts() == (0, 4)
+    assert second.tree_for("baseline", "60C_30RH").counts() == (4, 4)
 
 
 def test_data_root_is_remembered_between_sessions(qapp, tmp_path):
@@ -285,7 +353,7 @@ def test_gui_exclusion_changes_only_that_days_group_average(qapp, frame, isolate
     assert group_mean("3D") == (pytest.approx(4.0), 4)
 
     # drop the outlier on 3D only
-    win.trees[("3D", "25C_10RH")].topLevelItem(0).child(3) \
+    win.tree_for("3D", "25C_10RH").topLevelItem(0).child(3) \
         .setCheckState(0, Qt.Unchecked)
 
     assert group_mean("baseline") == (pytest.approx(4.0), 4)
@@ -299,7 +367,7 @@ def test_sync_off_by_default_keeps_exclusions_per_day(qapp, frame, isolated):
     win.populate(frame)
     assert win.sync_days is False
 
-    win.trees[("3D", "25C_10RH")].topLevelItem(0).child(0).setCheckState(0, Qt.Unchecked)
+    win.tree_for("3D", "25C_10RH").topLevelItem(0).child(0).setCheckState(0, Qt.Unchecked)
 
     assert win.selection.excluded_for("3D", "1236") == [11]
     assert win.selection.excluded_for("baseline", "1236") == []
@@ -311,13 +379,13 @@ def test_sync_on_applies_a_channel_tick_to_every_day(qapp, frame, isolated):
     win.btn_sync.setChecked(True)                      # turn universal mode on
     assert win.sync_days is True
 
-    win.trees[("3D", "25C_10RH")].topLevelItem(0).child(0).setCheckState(0, Qt.Unchecked)
+    win.tree_for("3D", "25C_10RH").topLevelItem(0).child(0).setCheckState(0, Qt.Unchecked)
 
     # excluded on BOTH days, and both day tabs reflect it
     assert win.selection.excluded_for("3D", "1236") == [11]
     assert win.selection.excluded_for("baseline", "1236") == [11]
-    assert win.trees[("baseline", "25C_10RH")].counts() == (7, 8)
-    assert win.trees[("3D", "25C_10RH")].counts() == (7, 8)
+    assert win.tree_for("baseline", "25C_10RH").counts() == (7, 8)
+    assert win.tree_for("3D", "25C_10RH").counts() == (7, 8)
 
 
 def test_sync_on_applies_a_whole_device_tick_to_every_day(qapp, frame, isolated):
@@ -325,7 +393,7 @@ def test_sync_on_applies_a_whole_device_tick_to_every_day(qapp, frame, isolated)
     win.populate(frame)
     win.btn_sync.setChecked(True)
 
-    win.trees[("baseline", "25C_10RH")].topLevelItem(0).setCheckState(0, Qt.Unchecked)
+    win.tree_for("baseline", "25C_10RH").topLevelItem(0).setCheckState(0, Qt.Unchecked)
 
     for day in ("baseline", "3D"):
         assert win.selection.excluded_for(day, "1236") == [11, 12, 31, 32]
@@ -336,7 +404,7 @@ def test_sync_is_non_destructive_when_toggled_off_again(qapp, frame, isolated):
     win.populate(frame)
 
     # a per-day exclusion made before sync exists
-    win.trees[("baseline", "25C_10RH")].topLevelItem(0).child(1).setCheckState(0, Qt.Unchecked)
+    win.tree_for("baseline", "25C_10RH").topLevelItem(0).child(1).setCheckState(0, Qt.Unchecked)
     # turning sync on and back off must not rewrite existing days
     win.btn_sync.setChecked(True)
     win.btn_sync.setChecked(False)

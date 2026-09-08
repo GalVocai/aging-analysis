@@ -7,7 +7,7 @@ import pytest
 
 from qfn_aging.allocation import DEFAULT
 from qfn_aging.grouping import add_group_keys, aggregate_groups
-from qfn_aging.masters import load_masters
+from qfn_aging.masters import load_masters, load_masters_cached
 
 
 def _write_master(root, timepoint, run_key, condition, mode, sheets: dict):
@@ -104,3 +104,30 @@ def test_unreadable_workbook_is_reported_and_other_data_still_loads(analysis_roo
 
     assert not tidy.empty
     assert any("could not read" in line and str(bad) in line for line in lines)
+
+
+def test_validated_cache_is_reused_and_invalidated(tmp_path, monkeypatch):
+    import qfn_aging.masters as masters
+
+    workbook = tmp_path / "analysis" / "3D" / "run" / "25C_10RH" / "JG" \
+        / "master_JG.xlsx"
+    workbook.parent.mkdir(parents=True)
+    workbook.write_bytes(b"version one")
+    expected = pd.DataFrame({"esn": ["1236"], "tnumber": [11], "value": [1.0]})
+    calls: list[int] = []
+
+    def fake_load(*args, **kwargs):
+        calls.append(1)
+        return expected.copy()
+
+    monkeypatch.setattr(masters, "load_masters", fake_load)
+    cache = tmp_path / "cache"
+
+    first = load_masters_cached(tmp_path / "analysis", cache_dir=cache)
+    second = load_masters_cached(tmp_path / "analysis", cache_dir=cache)
+    assert first.equals(expected) and second.equals(expected)
+    assert len(calls) == 1
+
+    workbook.write_bytes(b"version two is a different size")
+    load_masters_cached(tmp_path / "analysis", cache_dir=cache)
+    assert len(calls) == 2

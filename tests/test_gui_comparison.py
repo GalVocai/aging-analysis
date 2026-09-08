@@ -143,7 +143,8 @@ def test_selection_change_triggers_a_redraw(win, monkeypatch):
     calls: list[int] = []
     monkeypatch.setattr(win, "_refresh_comparison", lambda: calls.append(1))
 
-    win.trees[("baseline", "25C_10RH")].topLevelItem(0).child(0)         .setCheckState(0, Qt.Unchecked)
+    win.tree_for("baseline", "25C_10RH").topLevelItem(0).child(0) \
+        .setCheckState(0, Qt.Unchecked)
     assert calls, "unticking must refresh the comparison plot"
 
 

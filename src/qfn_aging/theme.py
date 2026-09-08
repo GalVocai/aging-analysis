@@ -169,6 +169,15 @@ QTreeWidget::indicator:indeterminate {{
     background: {GREEN};
     border-color: {GREEN};
 }}
+QTableWidget {{
+    background: {SURFACE};
+    alternate-background-color: {GREEN_TINT};
+    border: 1px solid {LINE};
+    border-radius: 8px;
+    gridline-color: #edf0f2;
+    outline: none;
+}}
+QTableWidget::item {{ padding: 5px 6px; }}
 QHeaderView::section {{
     background: {CANVAS};
     color: {INK_SOFT};
